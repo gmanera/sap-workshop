@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EKS Worker Nodes with Security Group
+
+Resources:
+  # IAM Role for EKS Worker Nodes
+  EKSWorkerNodeRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Path: "/"
+      Tags:
+        - Key: Name
+          Value: EKSWorkerNodeRole
+
+  # Instance Profile for EKS Worker Nodes
+  EKSWorkerNodeInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref EKSWorkerNodeRole
+
+  # Node Security Group
+  NodeSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security group for EKS worker nodes'
+      VpcId: vpc-04746a1f3bd81938d
+      Tags:
+        - Key: Name
+          Value: NodeSecurityGroup
+
+  # Auto Scaling Group for EKS Worker Nodes
+  EKSWorkerNodes:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      DesiredCapacity: '2'
+      MaxSize: '2'
+      MinSize: '2'
+      VPCZoneIdentifier:
+        - subnet-01f5f40b90f0b0c52 
+      LaunchConfigurationName: !Ref EKSWorkerNodeLaunchConfig
+      Tags:
+        - Key: Name
+          Value: EKSWorkerNode
+          PropagateAtLaunch: true
+
+  # Launch Configuration for EKS Worker Nodes
+  EKSWorkerNodeLaunchConfig:
+    Type: 'AWS::AutoScaling::LaunchConfiguration'
+    Properties:
+      IamInstanceProfile: !Ref EKSWorkerNodeInstanceProfile
+      ImageId: ami-0484545fe7d3da96f #AWS EKS AMI 
+      InstanceType: t3.micro  
+      SecurityGroups:
+        - !Ref NodeSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -o xtrace
+          /etc/eks/bootstrap.sh GabrielManeraWorkshopCluster --kubelet-extra-args '--node-labels=nodegroup=standard-workers'
+
+Outputs:
+  NodeSecurityGroupID:
+    Description: Security Group ID for EKS Worker Nodes
+    Value: !Ref NodeSecurityGroup
+  WorkerNodeAutoScalingGroupName:
+    Description: Auto Scaling Group Name for EKS Worker Nodes
+    Value: !Ref EKSWorkerNodes

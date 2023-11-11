@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EKS Cluster for Gabriel Manera Workshop
+
+Resources:
+
+  # EKS Cluster Role
+  EKSClusterRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: eks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+      Path: /
+      Tags:
+        - Key: Name
+          Value: EKSClusterRole
+
+
+  # EKS Cluster Security Group
+  EKSClusterSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Security Group for EKS Cluster
+      VpcId: vpc-04746a1f3bd81938d
+      Tags:
+        - Key: Name
+          Value: EKSClusterSecurityGroup
+
+  # EKS Cluster
+  EKSCluster:
+    Type: 'AWS::EKS::Cluster'
+    Properties:
+      Name: GabrielManeraWorkshopCluster
+      Version: '1.28'  # Make sure to use a supported version
+      RoleArn: !GetAtt EKSClusterRole.Arn
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - !Ref EKSClusterSecurityGroup
+        SubnetIds:
+          - subnet-01f5f40b90f0b0c52  # Public Subnet One ID
+          - subnet-06c37fa12e981ee54  # Public Subnet Two ID
+      EncryptionConfig:
+        - Resources:
+            - "secrets"
+          Provider:
+            KeyArn: "arn:aws:kms:us-east-2:574137357818:key/f2b7b7b0-3e37-4bfc-b06f-0727b21ed6d5" # Your KMS Key ARN
+
+Outputs:
+  EKSClusterName:
+    Description: The name of the EKS cluster
+    Value: !Ref EKSCluster
+  EKSClusterEndpoint:
+    Description: The endpoint of the EKS cluster
+    Value: !GetAtt EKSCluster.Endpoint
+  EKSClusterARN:
+    Description: The ARN of the EKS cluster
+    Value: !GetAtt EKSCluster.Arn
