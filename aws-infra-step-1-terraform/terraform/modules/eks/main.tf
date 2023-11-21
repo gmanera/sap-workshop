@@ -86,15 +86,6 @@ resource "kubernetes_secret" "secret-admin-password" {
   }
 }
 
-resource "aws_ebs_volume" "pv-awx-eks" {
-  availability_zone = "us-east-2a"
-  size              = 10            
-
-  tags = {
-    Name = "postgres-13-awx-eks-volume"
-  }
-}
-
 resource "kubernetes_persistent_volume" "postgres-13-awx-eks-pv" {
   metadata {
     name = "postgres-13-awx-eks-pv"
@@ -105,12 +96,10 @@ resource "kubernetes_persistent_volume" "postgres-13-awx-eks-pv" {
     }
     access_modes = ["ReadWriteOnce"]
     persistent_volume_source {
-      aws_elastic_block_store {
-        volume_id = var.ebs_volume_id
-      }
     }
     storage_class_name = "gp2"
     persistent_volume_reclaim_policy = "Retain"
+    
   }
 }
 

@@ -21,7 +21,6 @@ module "eks" {
   eks_cluster_role_arn = module.iam.eks_cluster_role_arn
   eks_node_role_arn = module.iam.eks_node_role_arn
   vpc_id      = module.vpc.vpc_id
-  ebs_volume_id = module.eks.ebs_volume_id
   awx-eks-secret = var.awx_eks_secret
   subnet_ids  = concat(module.vpc.public_subnet_ids, module.vpc.private_subnet_ids)
   environment = var.environment
