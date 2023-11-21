@@ -26,3 +26,13 @@ variable "eks_node_role_arn" {
   description = "ARN of the IAM role for the EKS Nodes"
   type        = string
 }
+
+variable "ebs_volume_id" {
+  description = "AWX PGSQL Volume ID"
+  type        = string
+}
+
+variable "awx-eks-secret" {
+  description = "Secret for AWX EKS"
+  type        = string
+}

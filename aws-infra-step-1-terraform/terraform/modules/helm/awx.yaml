@@ -1,0 +1,33 @@
+AWX:
+  enabled: true
+  name: awx-eks
+  namespace: awx-eks
+  postgres:
+    dbName: awx
+    host: awx-postgres-13
+    port: 5432
+    enabled: true
+    sslmode: prefer
+    type: managed
+    username: admin
+  spec:
+    admin_user: admin
+    projects_persistence: true
+    projects_storage_class: gp2
+    projects_storage_size: 1Gi
+    postgres_extra_args:
+      - "-c"
+      - "max_connections=1000"
+    postgres_resource_requirements:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 100m
+        memory: 1Gi
+    postgres_storage_class: gp2
+    postgres_storage_requirements:
+      limits:
+        storage: 1Gi
+      requests:
+        storage: 1Gi

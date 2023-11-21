@@ -13,3 +13,9 @@ variable "private_subnet_cidr" {
 variable "environment" {
   default = "gabrielmaneraworkshop"
 }
+
+
+variable "awx_eks_secret" {
+  description = "Secret for AWX EKS"
+  type        = string
+}
