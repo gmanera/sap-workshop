@@ -61,6 +61,31 @@ resource "aws_eks_node_group" "node_group" {
 
 }
 
+resource "aws_eks_addon" "aws-ebs-csi-driver" {
+  
+  cluster_name      = aws_eks_cluster.eks_cluster.name
+  addon_name        = "aws-ebs-csi-driver"
+  resolve_conflicts_on_create = "OVERWRITE"
+  preserve          = true
+
+  tags = {
+    "eks_addon" = "aws-ebs-csi-driver"
+  }
+}
+
+resource "aws_eks_addon" "aws-core-dns" {
+  
+  cluster_name      = aws_eks_cluster.eks_cluster.name
+  addon_name        = "coredns"
+  resolve_conflicts_on_create = "OVERWRITE"
+  preserve          = true
+
+  tags = {
+    "eks_addon" = "coredns"
+  }
+}
+
+
 resource "kubernetes_namespace" "awx-eks" {
   metadata {
     annotations = {
