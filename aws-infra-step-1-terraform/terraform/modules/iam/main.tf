@@ -39,20 +39,18 @@ resource "aws_iam_role" "eks_cluster" {
         },
         Action = "sts:AssumeRole"
       }
+      
     ]
   })
 }
 
-#IAM Roles for EKS
-resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks_cluster.name
+resource "aws_iam_policy" "aws_lb_controller_policy" {
+  name        = "${var.environment}-aws-lb-controller-policy"
+  description = "Policy for AWS Load Balancer Controller"
+
+  policy = file("${path.module}/iam-policy.json")
 }
 
-resource "aws_iam_role_policy_attachment" "eks_vpc_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-  role       = aws_iam_role.eks_cluster.name
-}
 
 resource "aws_iam_role" "eks_node" {
   name = "${var.environment}-eks-node-role"
@@ -76,7 +74,6 @@ resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
   role       = aws_iam_role.eks_node.name
 }
 
-#https://github.com/Chathuru/terraform-aws-eks/blob/master/iam_policy.tf
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
@@ -91,4 +88,20 @@ resource "aws_iam_role_policy_attachment" "eks_registry_policy" {
 resource "aws_iam_role_policy_attachment" "eks_csi_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   role       = aws_iam_role.eks_node.name
+}
+
+
+resource "aws_iam_role_policy_attachment" "lb_controller_node_attachment" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = aws_iam_policy.aws_lb_controller_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_cluster.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_vpc_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+  role       = aws_iam_role.eks_cluster.name
 }
