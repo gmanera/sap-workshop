@@ -18,3 +18,7 @@ output "secret_admin_password" {
   value = kubernetes_secret.secret-admin-password.data.password
   description = "AWX Admin Secret"
 }
+
+output "cluster_name" {
+  value = module.eks.aws_eks_cluster.eks_cluster.name
+}

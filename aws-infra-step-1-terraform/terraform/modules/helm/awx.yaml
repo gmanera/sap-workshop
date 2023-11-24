@@ -12,9 +12,8 @@ AWX:
     username: admin
   spec:
     admin_user: admin
-    projects_persistence: true
+    projects_persistence: false
     projects_storage_class: gp2
-    projects_storage_size: 1Gi
     postgres_extra_args:
       - "-c"
       - "max_connections=1000"
@@ -28,6 +27,6 @@ AWX:
     postgres_storage_class: gp2
     postgres_storage_requirements:
       limits:
-        storage: 1Gi
+        storage: 10Gi
       requests:
-        storage: 1Gi
+        storage: 5Gi
