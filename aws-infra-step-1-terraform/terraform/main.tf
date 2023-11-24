@@ -27,5 +27,6 @@ module "eks" {
 }
 
 module "helm" {
+  eks_cluster_name = module.eks.cluster_name
   source = "./modules/helm"
 }

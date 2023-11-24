@@ -20,5 +20,5 @@ output "secret_admin_password" {
 }
 
 output "cluster_name" {
-  value = module.eks.aws_eks_cluster.eks_cluster.name
+  value = aws_eks_cluster.eks_cluster.name
 }
