@@ -111,23 +111,6 @@ resource "kubernetes_secret" "secret-admin-password" {
   }
 }
 
-#resource "kubernetes_persistent_volume" "postgres-13-awx-eks-pv" {
-#  metadata {
-#    name = "postgres-13-awx-eks-pv"
-#  }
-#  spec {
-#    capacity = {
-#      storage = "10Gi"
-#    }
-#    access_modes = ["ReadWriteOnce"]
-#    persistent_volume_source {
-#    }
-#    storage_class_name = "gp2"
-#    persistent_volume_reclaim_policy = "Retain"
-#    
-#  }
-#}
-
 resource "aws_eks_addon" "cloudwatch" {
   
   cluster_name      = aws_eks_cluster.eks_cluster.name
